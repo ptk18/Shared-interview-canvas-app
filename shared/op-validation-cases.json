@@ -1,0 +1,1455 @@
+{
+  "description": "Shared op-validation cases. Each case is applied to a fresh copy of baseCanvas. Both the FastAPI backend and the frontend mock backend must produce the expected outcome. For accepted create/update cases, expectShape is the resulting shape stored in the canvas.",
+  "baseCanvas": {
+    "revision": 7,
+    "shapes": [
+      {
+        "id": "r1",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      },
+      {
+        "id": "e1",
+        "type": "ellipse",
+        "x": 200,
+        "y": 0,
+        "width": 80,
+        "height": 80,
+        "fill": "transparent",
+        "stroke": "#1f2933",
+        "label": "",
+        "textColor": "#1f2933"
+      },
+      {
+        "id": "t1",
+        "type": "text",
+        "x": 0,
+        "y": 200,
+        "width": 160,
+        "text": "hello",
+        "fontSize": 18,
+        "textColor": "#1f2933"
+      },
+      {
+        "id": "l1",
+        "type": "line",
+        "x1": 100,
+        "y1": 30,
+        "x2": 200,
+        "y2": 40,
+        "stroke": "#1f2933",
+        "start": {
+          "shapeId": "r1"
+        },
+        "end": null
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "create rect",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r2",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create ellipse",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "e2",
+          "type": "ellipse",
+          "x": 200,
+          "y": 0,
+          "width": 80,
+          "height": 80,
+          "fill": "transparent",
+          "stroke": "#1f2933",
+          "label": "",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "e2",
+        "type": "ellipse",
+        "x": 200,
+        "y": 0,
+        "width": 80,
+        "height": 80,
+        "fill": "transparent",
+        "stroke": "#1f2933",
+        "label": "",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create text",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "t2",
+          "type": "text",
+          "x": 0,
+          "y": 200,
+          "width": 160,
+          "text": "hello",
+          "fontSize": 18,
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "t2",
+        "type": "text",
+        "x": 0,
+        "y": 200,
+        "width": 160,
+        "text": "hello",
+        "fontSize": 18,
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create text with empty string",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "t2",
+          "type": "text",
+          "x": 0,
+          "y": 200,
+          "width": 160,
+          "text": "",
+          "fontSize": 18,
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "t2",
+        "type": "text",
+        "x": 0,
+        "y": 200,
+        "width": 160,
+        "text": "",
+        "fontSize": 18,
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create arrow bound to two shapes",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": {
+            "shapeId": "r1"
+          },
+          "end": {
+            "shapeId": "e1"
+          }
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "a1",
+        "type": "arrow",
+        "x1": 0,
+        "y1": 0,
+        "x2": 10,
+        "y2": 10,
+        "stroke": "#c92a2a",
+        "start": {
+          "shapeId": "r1"
+        },
+        "end": {
+          "shapeId": "e1"
+        }
+      }
+    },
+    {
+      "name": "create arrow bound to text",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": {
+            "shapeId": "r1"
+          },
+          "end": {
+            "shapeId": "t1"
+          }
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "a1",
+        "type": "arrow",
+        "x1": 0,
+        "y1": 0,
+        "x2": 10,
+        "y2": 10,
+        "stroke": "#c92a2a",
+        "start": {
+          "shapeId": "r1"
+        },
+        "end": {
+          "shapeId": "t1"
+        }
+      }
+    },
+    {
+      "name": "create unbound line",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "l2",
+          "type": "line",
+          "x1": 100,
+          "y1": 30,
+          "x2": 200,
+          "y2": 40,
+          "stroke": "#1f2933",
+          "start": null,
+          "end": null
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "l2",
+        "type": "line",
+        "x1": 100,
+        "y1": 30,
+        "x2": 200,
+        "y2": 40,
+        "stroke": "#1f2933",
+        "start": null,
+        "end": null
+      }
+    },
+    {
+      "name": "create accepts integer and float coordinates",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": -12.5,
+          "y": 7,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r2",
+        "type": "rect",
+        "x": -12.5,
+        "y": 7,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create accepts uppercase hex colour",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ABCDEF",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r2",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ABCDEF",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create accepts id with dash and underscore",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a-b_C9",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "a-b_C9",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create accepts coordinate at the bound",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 1000000,
+          "y": -1000000,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r2",
+        "type": "rect",
+        "x": 1000000,
+        "y": -1000000,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create accepts zero-size rect",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r2",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create accepts label of 2000 chars",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r2",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create duplicate id",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r1",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "duplicate_id"
+      }
+    },
+    {
+      "name": "create unknown type",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "hexagon",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create missing field",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create extra field",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933",
+          "rotation": 45
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create field from another type",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933",
+          "fontSize": 12
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create numeric string coordinate",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": "10",
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create boolean coordinate",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": true,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create coordinate out of range",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 1000001,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create negative width",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": -1,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create bad colour name",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "red",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create short hex colour",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#fff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create label too long",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create text too long",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "t2",
+          "type": "text",
+          "x": 0,
+          "y": 200,
+          "width": 160,
+          "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "fontSize": 18,
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create font size too small",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "t2",
+          "type": "text",
+          "x": 0,
+          "y": 200,
+          "width": 160,
+          "text": "hello",
+          "fontSize": 7,
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create font size too large",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "t2",
+          "type": "text",
+          "x": 0,
+          "y": 200,
+          "width": 160,
+          "text": "hello",
+          "fontSize": 201,
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create text width zero",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "t2",
+          "type": "text",
+          "x": 0,
+          "y": 200,
+          "width": 0,
+          "text": "hello",
+          "fontSize": 18,
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create id with illegal characters",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r 2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create empty id",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create id longer than 64",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "API",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create label not a string",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": 5,
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create binding with extra key",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": {
+            "shapeId": "r1",
+            "side": "left"
+          },
+          "end": {
+            "shapeId": "e1"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create binding not an object",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": "r1",
+          "end": {
+            "shapeId": "e1"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create binding to missing shape",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": {
+            "shapeId": "r1"
+          },
+          "end": {
+            "shapeId": "nope"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_binding"
+      }
+    },
+    {
+      "name": "create binding to a connector",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": {
+            "shapeId": "r1"
+          },
+          "end": {
+            "shapeId": "l1"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_binding"
+      }
+    },
+    {
+      "name": "create binding to itself",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": {
+            "shapeId": "r1"
+          },
+          "end": {
+            "shapeId": "a1"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_binding"
+      }
+    },
+    {
+      "name": "create duplicate id beats binding check",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "l1",
+          "type": "line",
+          "x1": 100,
+          "y1": 30,
+          "x2": 200,
+          "y2": 40,
+          "stroke": "#1f2933",
+          "start": {
+            "shapeId": "r1"
+          },
+          "end": {
+            "shapeId": "nope"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "duplicate_id"
+      }
+    },
+    {
+      "name": "create shape not an object",
+      "op": {
+        "kind": "create",
+        "shape": "r2"
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update move rect",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": {
+          "x": 40,
+          "y": -5
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r1",
+        "type": "rect",
+        "x": 40,
+        "y": -5,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "update recolour and relabel",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": {
+          "fill": "#ffe066",
+          "label": "LB"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r1",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffe066",
+        "stroke": "#1f2933",
+        "label": "LB",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "update empty patch",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": {}
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r1",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "API",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "update text content",
+      "op": {
+        "kind": "update",
+        "id": "t1",
+        "patch": {
+          "text": "world",
+          "width": 200
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "t1",
+        "type": "text",
+        "x": 0,
+        "y": 200,
+        "width": 200,
+        "text": "world",
+        "fontSize": 18,
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "update connector binding",
+      "op": {
+        "kind": "update",
+        "id": "l1",
+        "patch": {
+          "end": {
+            "shapeId": "e1"
+          }
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "l1",
+        "type": "line",
+        "x1": 100,
+        "y1": 30,
+        "x2": 200,
+        "y2": 40,
+        "stroke": "#1f2933",
+        "start": {
+          "shapeId": "r1"
+        },
+        "end": {
+          "shapeId": "e1"
+        }
+      }
+    },
+    {
+      "name": "update connector unbind",
+      "op": {
+        "kind": "update",
+        "id": "l1",
+        "patch": {
+          "start": null,
+          "x1": 5
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "l1",
+        "type": "line",
+        "x1": 5,
+        "y1": 30,
+        "x2": 200,
+        "y2": 40,
+        "stroke": "#1f2933",
+        "start": null,
+        "end": null
+      }
+    },
+    {
+      "name": "update missing shape",
+      "op": {
+        "kind": "update",
+        "id": "zz",
+        "patch": {
+          "x": 1
+        }
+      },
+      "expect": {
+        "rejected": "shape_not_found"
+      }
+    },
+    {
+      "name": "update missing shape beats bad patch",
+      "op": {
+        "kind": "update",
+        "id": "zz",
+        "patch": {
+          "bogus": 1
+        }
+      },
+      "expect": {
+        "rejected": "shape_not_found"
+      }
+    },
+    {
+      "name": "update id in patch",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": {
+          "id": "r9"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update type in patch",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": {
+          "type": "ellipse"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update field of another type",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": {
+          "text": "x"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update invalid value",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": {
+          "width": -5
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update patch not an object",
+      "op": {
+        "kind": "update",
+        "id": "r1",
+        "patch": [
+          1
+        ]
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update binding to missing shape",
+      "op": {
+        "kind": "update",
+        "id": "l1",
+        "patch": {
+          "end": {
+            "shapeId": "gone"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_binding"
+      }
+    },
+    {
+      "name": "update binding to connector",
+      "op": {
+        "kind": "update",
+        "id": "l1",
+        "patch": {
+          "end": {
+            "shapeId": "l1"
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_binding"
+      }
+    },
+    {
+      "name": "delete shape",
+      "op": {
+        "kind": "delete",
+        "id": "r1"
+      },
+      "expect": "accepted"
+    },
+    {
+      "name": "delete missing shape",
+      "op": {
+        "kind": "delete",
+        "id": "nope"
+      },
+      "expect": {
+        "rejected": "shape_not_found"
+      }
+    },
+    {
+      "name": "op unknown kind",
+      "op": {
+        "kind": "rename",
+        "id": "r1"
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "op not an object",
+      "op": "create",
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "op extra top-level key",
+      "op": {
+        "kind": "delete",
+        "id": "r1",
+        "force": true
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "op missing id",
+      "op": {
+        "kind": "delete"
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "op id not a string",
+      "op": {
+        "kind": "delete",
+        "id": 5
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update missing patch",
+      "op": {
+        "kind": "update",
+        "id": "r1"
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create counts label length in code points (1500 emoji)",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": "accepted",
+      "expectShape": {
+        "id": "r2",
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 60,
+        "fill": "#ffffff",
+        "stroke": "#1f2933",
+        "label": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "textColor": "#1f2933"
+      }
+    },
+    {
+      "name": "create rejects label over 2000 code points",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "r2",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 60,
+          "fill": "#ffffff",
+          "stroke": "#1f2933",
+          "label": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+          "textColor": "#1f2933"
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "create binding with malformed shapeId",
+      "op": {
+        "kind": "create",
+        "shape": {
+          "id": "a1",
+          "type": "arrow",
+          "x1": 0,
+          "y1": 0,
+          "x2": 10,
+          "y2": 10,
+          "stroke": "#c92a2a",
+          "start": {
+            "shapeId": "bad id!"
+          },
+          "end": null
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    },
+    {
+      "name": "update binding with malformed shapeId",
+      "op": {
+        "kind": "update",
+        "id": "l1",
+        "patch": {
+          "end": {
+            "shapeId": ""
+          }
+        }
+      },
+      "expect": {
+        "rejected": "invalid_op"
+      }
+    }
+  ]
+}
