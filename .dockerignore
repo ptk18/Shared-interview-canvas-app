@@ -7,3 +7,4 @@
 **/*.tsbuildinfo
 frontend/dist
 backend/data
+e2e

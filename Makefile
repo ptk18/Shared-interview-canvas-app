@@ -9,14 +9,15 @@ DOCKER_PORT ?= 8080
 PG_TEST_PORT ?= 55432
 
 .DEFAULT_GOAL := help
-.PHONY: help install dev backend frontend mock test test-backend test-postgres test-frontend typecheck build docker docker-run clean
+.PHONY: help install dev backend frontend mock test test-backend test-postgres test-frontend e2e typecheck build docker docker-run clean
 
 help: ## Show this help
-	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[1mmake %-14s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z0-9_-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[1mmake %-14s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install backend and frontend dependencies
+install: ## Install backend, frontend and e2e dependencies
 	cd backend && uv sync
 	cd frontend && npm install
+	cd e2e && npm install
 
 dev: ## Run backend + frontend together (Ctrl-C stops both)
 	@echo "Open http://localhost:$(FRONTEND_PORT)  (backend on :$(BACKEND_PORT))"
@@ -53,6 +54,9 @@ test-postgres: ## Run backend tests against a throwaway Postgres container
 
 test-frontend: ## Run frontend tests (vitest)
 	cd frontend && npm test
+
+e2e: ## Run the Playwright end-to-end tests against docker-compose.yaml (app + Postgres)
+	cd e2e && npx playwright install chromium && npm test
 
 typecheck: ## Typecheck the frontend
 	cd frontend && npx tsc -b

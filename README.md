@@ -17,6 +17,7 @@ make dev       # backend + frontend → http://localhost:5173 (Ctrl-C stops both
 make mock      # frontend only, on the in-browser mock backend
 make test      # all tests
 make test-postgres  # backend tests on a throwaway Postgres container
+make e2e       # browser test of two people collaborating, on docker compose
 make help      # everything else
 ```
 
@@ -88,6 +89,24 @@ cd frontend && npm run typecheck
 
 Both suites run [`shared/op-validation-cases.json`](shared/op-validation-cases.json),
 so the FastAPI validator and the mock validator cannot drift apart.
+
+### End-to-end
+
+```bash
+cd e2e
+npm install
+npx playwright install chromium
+npm test                                    # or `make e2e` from the repo root
+E2E_BASE_URL=http://localhost:8080 npm test   # against a stack that is already running
+```
+
+[`e2e/tests/collaboration.spec.ts`](e2e/tests/collaboration.spec.ts) drives two
+separate browser sessions. The interviewer creates a room, takes its join link
+and joins; the candidate opens the link, joins and draws a rectangle; the test
+then checks that the same rectangle appears on the interviewer's canvas. Unless
+`E2E_BASE_URL` is set, it first builds and starts `docker-compose.yaml` (app and
+Postgres) as the `sdi-e2e` project on port 8180 (`E2E_PORT`), and removes those
+containers and their volume when it finishes.
 
 ## Architecture
 
