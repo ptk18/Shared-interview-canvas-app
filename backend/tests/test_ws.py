@@ -324,8 +324,8 @@ def test_debounced_save_writes_sqlite_and_broadcasts_saved(make_client, make_set
         saved_b = b.recv_type("saved")
         assert saved_a == saved_b
         assert saved_a["revision"] in (1, 2)
-        wait_for(lambda: db_row(settings.db_path, room_id)["revision"] == 2, what="revision 2 in sqlite")
-        row = db_row(settings.db_path, room_id)
+        wait_for(lambda: db_row(settings, room_id)["revision"] == 2, what="revision 2 in sqlite")
+        row = db_row(settings, room_id)
         canvas = json.loads(row["canvas_json"])
         assert canvas["revision"] == 2 and row["status"] == "active"
         assert [s["id"] for s in canvas["shapes"]] == ["r1"] and canvas["shapes"][0]["x"] == 9
@@ -352,7 +352,7 @@ def test_snapshot_survives_app_restart(make_settings):
             a.send(op_msg(create_op(rect("r1"))))
             a.send(op_msg(create_op(rect("r2"))))
             a.recv_type("saved")
-            wait_for(lambda: db_row(settings.db_path, room_id)["revision"] == 2)
+            wait_for(lambda: db_row(settings, room_id)["revision"] == 2)
 
     with TestClient(create_app(settings)) as c2:
         body = c2.get(f"/api/rooms/{room_id}").json()
@@ -377,8 +377,8 @@ def test_shutdown_flushes_unsaved_changes(make_settings):
             a.recv_type("op")
             a.drop()
         # room stays in memory (reserved slot) with an unsaved change when the app stops
-        assert db_row(settings.db_path, room_id)["revision"] == 0
-    assert db_row(settings.db_path, room_id)["revision"] == 1
+        assert db_row(settings, room_id)["revision"] == 0
+    assert db_row(settings, room_id)["revision"] == 1
 
 
 def test_empty_room_cleanup_flushes_and_releases_memory_without_completing(make_client, make_settings):
@@ -391,7 +391,7 @@ def test_empty_room_cleanup_flushes_and_releases_memory_without_completing(make_
         a.recv_type("op")
         assert room_id in manager.rooms
     wait_for(lambda: room_id not in manager.rooms, what="room released from memory")
-    row = db_row(settings.db_path, room_id)
+    row = db_row(settings, room_id)
     assert row["revision"] == 1, "pending snapshot was flushed before release"
     assert row["status"] == "active" and row["completed_at"] is None
     body = client.get(f"/api/rooms/{room_id}").json()
@@ -471,7 +471,7 @@ def test_dirty_room_is_not_released_until_save_succeeds(make_client, make_settin
     assert room_id in manager.rooms, "dirty room must stay in memory"
     state["fail"] = False
     wait_for(lambda: room_id not in manager.rooms, what="release after recovery")
-    assert db_row(settings.db_path, room_id)["revision"] == 1
+    assert db_row(settings, room_id)["revision"] == 1
 
 
 def test_snapshot_write_never_replaces_a_higher_revision(make_client, make_settings):
@@ -481,7 +481,7 @@ def test_snapshot_write_never_replaces_a_higher_revision(make_client, make_setti
     db = client.app.state.db
     assert db.save_snapshot(room_id, '{"revision":5,"shapes":[]}', 5, "2026-01-01T00:00:00.000Z") is True
     assert db.save_snapshot(room_id, '{"revision":3,"shapes":[]}', 3, "2026-01-01T00:00:00.000Z") is False
-    assert db_row(settings.db_path, room_id)["revision"] == 5
+    assert db_row(settings, room_id)["revision"] == 5
 
 
 # ---------------------------------------------------------------- end session
@@ -505,7 +505,7 @@ def test_end_session_completes_room_and_closes_everyone_with_4009(client, make_s
             assert ended[0]["canvas"]["revision"] == 1
             assert [s["id"] for s in ended[0]["canvas"]["shapes"]] == ["r1"]
 
-    row = db_row(settings.db_path, room_id)
+    row = db_row(settings, room_id)
     assert row["status"] == "completed" and row["completed_at"] and row["revision"] == 1
     assert client.app.state.manager.rooms.get(room_id) is None
 
@@ -525,7 +525,7 @@ def test_end_session_flushes_pending_changes_even_with_long_debounce(make_client
         a.send({"type": "end_session"})
         msgs, close = a.recv_close()
         assert close == 4009
-    row = db_row(settings.db_path, room_id)
+    row = db_row(settings, room_id)
     assert row["status"] == "completed" and json.loads(row["canvas_json"])["revision"] == 2
 
 
@@ -560,7 +560,7 @@ def test_end_session_with_failing_flush_keeps_room_active(client, make_settings)
         err = a.recv_type("error")
         assert err["code"] == "save_failed"
         assert [m for m in b.sync() if m["type"] in ("session_ended", "error")] == []
-        assert db_row(settings.db_path, room_id)["status"] == "active"
+        assert db_row(settings, room_id)["status"] == "active"
 
         # still fully usable, and a later attempt succeeds
         a.send(op_msg(create_op(rect("r2")), "c_2"))
@@ -569,4 +569,4 @@ def test_end_session_with_failing_flush_keeps_room_active(client, make_settings)
         a.send({"type": "end_session"})
         _, close = a.recv_close()
         assert close == 4009
-    assert db_row(settings.db_path, room_id)["status"] == "completed"
+    assert db_row(settings, room_id)["status"] == "completed"

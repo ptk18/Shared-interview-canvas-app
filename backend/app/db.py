@@ -1,21 +1,49 @@
+"""Room persistence through SQLAlchemy Core.
+
+Everything here is portable SQL; the only dialect-specific code is the SQLite
+setup in `create_db_engine`. To add another database, install its driver and
+point DATABASE_URL at it (see README).
+"""
+
 from __future__ import annotations
 
-import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS rooms (
-    id           TEXT PRIMARY KEY,
-    title        TEXT NOT NULL,
-    status       TEXT NOT NULL CHECK (status IN ('active', 'completed')),
-    canvas_json  TEXT NOT NULL,
-    revision     INTEGER NOT NULL,
-    created_at   TEXT NOT NULL,
-    updated_at   TEXT NOT NULL,
-    completed_at TEXT
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    Engine,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    Text,
+    create_engine,
+    event,
+    insert,
+    make_url,
+    select,
+    update,
 )
-"""
+from sqlalchemy.pool import StaticPool
+
+metadata = MetaData()
+
+rooms = Table(
+    "rooms",
+    metadata,
+    Column("id", String(64), primary_key=True),
+    Column("title", String(255), nullable=False),
+    Column("status", String(16), nullable=False),
+    Column("canvas_json", Text, nullable=False),
+    Column("revision", Integer, nullable=False),
+    # ISO-8601 UTC strings, exactly as the API returns them.
+    Column("created_at", String(40), nullable=False),
+    Column("updated_at", String(40), nullable=False),
+    Column("completed_at", String(40), nullable=True),
+    CheckConstraint("status IN ('active', 'completed')", name="rooms_status_check"),
+)
 
 
 @dataclass(frozen=True)
@@ -30,80 +58,88 @@ class RoomRecord:
     completed_at: str | None
 
 
+def create_db_engine(database_url: str) -> Engine:
+    url = make_url(database_url)
+    if url.get_backend_name() != "sqlite":
+        # pre_ping replaces connections a database server closed while idle.
+        return create_engine(url, pool_pre_ping=True)
+
+    database = url.database or ""
+    if database in ("", ":memory:"):
+        # One shared connection; otherwise every thread would see its own empty database.
+        engine = create_engine(url, poolclass=StaticPool, connect_args={"check_same_thread": False})
+    else:
+        Path(database).expanduser().parent.mkdir(parents=True, exist_ok=True)
+        engine = create_engine(url)
+
+    @event.listens_for(engine, "connect")
+    def _sqlite_pragmas(dbapi_conn, _record):  # type: ignore[no-untyped-def]
+        cursor = dbapi_conn.cursor()
+        # WAL lets the REST reads proceed while a snapshot is being written.
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA busy_timeout=5000")
+        cursor.close()
+
+    return engine
+
+
 class Database:
-    """Blocking SQLite access; callers run these methods via asyncio.to_thread.
+    """Blocking database access; callers run these methods via asyncio.to_thread."""
 
-    A connection per call keeps the class thread-safe without a pool; at this
-    scale the open cost is negligible next to the fsync of a snapshot write.
-    """
-
-    def __init__(self, path: Path):
-        self.path = Path(path)
-
-    def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.path, timeout=5.0)
-        conn.row_factory = sqlite3.Row
-        return conn
+    def __init__(self, database_url: str):
+        self.engine = create_db_engine(database_url)
 
     def init_schema(self) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        conn = self._connect()
-        try:
-            conn.execute("PRAGMA journal_mode=WAL")
-            with conn:
-                conn.execute(SCHEMA)
-        finally:
-            conn.close()
+        # Creates missing tables only; existing data is left untouched.
+        metadata.create_all(self.engine)
+
+    def close(self) -> None:
+        self.engine.dispose()
 
     def create_room(self, room_id: str, title: str, canvas_json: str, now: str) -> None:
-        conn = self._connect()
-        try:
-            with conn:
-                conn.execute(
-                    "INSERT INTO rooms (id, title, status, canvas_json, revision, created_at, updated_at)"
-                    " VALUES (?, ?, 'active', ?, 0, ?, ?)",
-                    (room_id, title, canvas_json, now, now),
+        with self.engine.begin() as conn:
+            conn.execute(
+                insert(rooms).values(
+                    id=room_id,
+                    title=title,
+                    status="active",
+                    canvas_json=canvas_json,
+                    revision=0,
+                    created_at=now,
+                    updated_at=now,
+                    completed_at=None,
                 )
-        finally:
-            conn.close()
+            )
 
     def get_room(self, room_id: str) -> RoomRecord | None:
-        conn = self._connect()
-        try:
-            row = conn.execute("SELECT * FROM rooms WHERE id = ?", (room_id,)).fetchone()
-        finally:
-            conn.close()
-        if row is None:
-            return None
-        return RoomRecord(**{k: row[k] for k in row.keys()})
+        with self.engine.connect() as conn:
+            row = conn.execute(select(rooms).where(rooms.c.id == room_id)).mappings().first()
+        return RoomRecord(**row) if row is not None else None
 
     def save_snapshot(self, room_id: str, canvas_json: str, revision: int, now: str) -> bool:
         """Returns False when nothing was written (a newer snapshot or completion already exists)."""
-        conn = self._connect()
-        try:
-            with conn:
-                cur = conn.execute(
-                    "UPDATE rooms SET canvas_json = ?, revision = ?, updated_at = ?"
-                    " WHERE id = ? AND status = 'active' AND revision <= ?",
-                    (canvas_json, revision, now, room_id, revision),
-                )
-                return cur.rowcount == 1
-        finally:
-            conn.close()
+        with self.engine.begin() as conn:
+            result = conn.execute(
+                update(rooms)
+                .where(rooms.c.id == room_id, rooms.c.status == "active", rooms.c.revision <= revision)
+                .values(canvas_json=canvas_json, revision=revision, updated_at=now)
+            )
+            return result.rowcount == 1
 
     def complete_room(self, room_id: str, canvas_json: str, revision: int, now: str) -> None:
         """Writes the final snapshot and flips status in one statement, so a crash cannot leave
         a completed room with a stale canvas."""
-        conn = self._connect()
-        try:
-            with conn:
-                cur = conn.execute(
-                    "UPDATE rooms SET status = 'completed', canvas_json = ?, revision = ?,"
-                    " updated_at = ?, completed_at = ?"
-                    " WHERE id = ? AND status = 'active' AND revision <= ?",
-                    (canvas_json, revision, now, now, room_id, revision),
+        with self.engine.begin() as conn:
+            result = conn.execute(
+                update(rooms)
+                .where(rooms.c.id == room_id, rooms.c.status == "active", rooms.c.revision <= revision)
+                .values(
+                    status="completed",
+                    canvas_json=canvas_json,
+                    revision=revision,
+                    updated_at=now,
+                    completed_at=now,
                 )
-                if cur.rowcount != 1:
-                    raise RuntimeError(f"room {room_id} could not be completed")
-        finally:
-            conn.close()
+            )
+            if result.rowcount != 1:
+                raise RuntimeError(f"room {room_id} could not be completed")

@@ -20,7 +20,11 @@ make help      # everything else
 ```
 
 `make dev` runs the backend on port 8001; use `make dev BACKEND_PORT=8000` to
-change it. The sections below describe the same steps without `make`.
+change it. The backend stores rooms in SQLite at `backend/data/app.db` by
+default; set `DATABASE_URL` to use another database (see
+[`backend/README.md`](backend/README.md#databases)), e.g.
+`DATABASE_URL=sqlite:////tmp/sdi.db make dev`. The sections below describe the
+same steps without `make`.
 
 ### Without a backend (mock mode)
 
@@ -87,7 +91,7 @@ backend/app
   rooms.py             in-memory room manager: slots, grace timers, ordered
                        broadcast, debounced snapshots, end session
   canvas.py            op validation and application
-  db.py                SQLite snapshot persistence
+  db.py                snapshot persistence via SQLAlchemy (DATABASE_URL)
   main.py              FastAPI app (REST + WebSocket)
 ```
 
@@ -97,7 +101,7 @@ Key behaviours:
   broadcasts it. Clients show their own edits immediately and reconcile when
   the server echoes them. Ops at or below the revision a client already holds
   are ignored.
-- **Persistence** writes a full-canvas snapshot to SQLite 500 ms after the last
+- **Persistence** writes a full-canvas snapshot to the database 500 ms after the last
   change. The **Saved** status means the server confirmed the write.
 - **Reconnection:** while disconnected, editing is disabled and unconfirmed
   edits are dropped. On reconnect the client reloads the authoritative canvas

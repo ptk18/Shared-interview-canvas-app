@@ -32,7 +32,7 @@ def error_response(status_code: int, code: str, message: str) -> Response:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
-    db = Database(settings.db_path)
+    db = Database(settings.database_url)
     manager = RoomManager(db, settings)
 
     @asynccontextmanager
@@ -40,6 +40,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         await asyncio.to_thread(db.init_schema)
         yield
         await manager.shutdown()
+        db.close()
 
     app = FastAPI(title="System Design Whiteboard", lifespan=lifespan)
     app.state.settings = settings

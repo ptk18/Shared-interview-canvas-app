@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import sqlite3
+import os
 import time
 from contextlib import contextmanager
 from pathlib import Path
@@ -11,8 +11,16 @@ import anyio
 import pytest
 from fastapi.testclient import TestClient
 
+from sqlalchemy import create_engine, select
+
 from app.config import Settings
+from app.db import metadata, rooms
 from app.main import create_app
+
+# Run the suite against another database with e.g.
+#   TEST_DATABASE_URL=postgresql+psycopg://localhost/sdi_test uv run pytest
+# Tables are recreated before every test. Default: a fresh SQLite file per test.
+TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "").strip()
 
 RECV_TIMEOUT = 5.0
 SYNC_TYPE = "__sync__"
@@ -134,20 +142,28 @@ def wait_for(cond: Callable[[], bool], timeout: float = RECV_TIMEOUT, what: str 
     raise AssertionError(f"timed out waiting for {what}")
 
 
-def db_row(path: Path, room_id: str) -> sqlite3.Row | None:
-    conn = sqlite3.connect(path)
-    conn.row_factory = sqlite3.Row
+def db_row(settings: Settings, room_id: str) -> dict[str, Any] | None:
+    """Reads a room straight from the database, bypassing the app."""
+    engine = create_engine(settings.database_url)
     try:
-        return conn.execute("SELECT * FROM rooms WHERE id = ?", (room_id,)).fetchone()
+        with engine.connect() as conn:
+            row = conn.execute(select(rooms).where(rooms.c.id == room_id)).mappings().first()
+            return dict(row) if row is not None else None
     finally:
-        conn.close()
+        engine.dispose()
 
 
 @pytest.fixture
 def make_settings(tmp_path: Path) -> Callable[..., Settings]:
+    if TEST_DATABASE_URL:
+        engine = create_engine(TEST_DATABASE_URL)
+        metadata.drop_all(engine)
+        engine.dispose()
+    database_url = TEST_DATABASE_URL or f"sqlite:///{tmp_path / 'data' / 'app.db'}"
+
     def factory(**over: Any) -> Settings:
         values: dict[str, Any] = dict(
-            db_path=tmp_path / "data" / "app.db", save_debounce_s=0.05, grace_period_s=0.4, save_retry_s=0.1
+            database_url=database_url, save_debounce_s=0.05, grace_period_s=0.4, save_retry_s=0.1
         )
         values.update(over)
         return Settings(**values)

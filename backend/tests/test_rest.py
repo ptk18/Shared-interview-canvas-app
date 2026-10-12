@@ -89,4 +89,4 @@ def test_get_live_room_returns_in_memory_canvas_newer_than_snapshot(make_client,
         body = client.get(f"/api/rooms/{room_id}").json()
         assert body["canvas"]["revision"] == 1
         assert [s["id"] for s in body["canvas"]["shapes"]] == ["r1"]
-        assert db_row(settings.db_path, room_id)["revision"] == 0, "debounce has not fired yet"
+        assert db_row(settings, room_id)["revision"] == 0, "debounce has not fired yet"
