@@ -71,7 +71,7 @@ describe('mock server — REST equivalents', () => {
     expect(detail.canvas).toEqual({ revision: 0, shapes: [] });
   });
 
-  it.each([[''], ['   '], ['x'.repeat(121)]])('rejects title %j with invalid_title', async (title) => {
+  it.each([[''], ['   '], ['x'.repeat(121)], ['a\u0000b']])('rejects title %j with invalid_title', async (title) => {
     h = createHarness();
     await expect(h.client().createRoom(title)).rejects.toMatchObject({ status: 422, code: 'invalid_title' });
   });

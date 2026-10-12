@@ -103,6 +103,10 @@ export class MockServer {
     if (!trimmed || codePointLength(trimmed) > MAX_TITLE_LENGTH) {
       throw new ApiError(422, 'invalid_title', `Title must be 1–${MAX_TITLE_LENGTH} characters.`);
     }
+    if (trimmed.includes('\u0000')) {
+      // Matches the FastAPI backend, which rejects NUL because Postgres cannot store it.
+      throw new ApiError(422, 'invalid_title', 'Title must not contain NUL characters.');
+    }
     const now = nowIso();
     const room: Room = {
       id: randomToken(16),

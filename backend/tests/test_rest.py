@@ -39,8 +39,11 @@ def test_title_of_exactly_120_chars_is_accepted_after_trim(client):
 
 @pytest.mark.parametrize(
     "body",
-    [{}, {"title": 5}, {"title": None}, {"title": ["x"]}, {"title": ""}, {"title": "   \n\t"}, {"title": "a" * 121}],
-    ids=["missing", "number", "null", "list", "empty", "blank", "too-long"],
+    [
+        {}, {"title": 5}, {"title": None}, {"title": ["x"]}, {"title": ""}, {"title": "   \n\t"},
+        {"title": "a" * 121}, {"title": "a\u0000b"},
+    ],
+    ids=["missing", "number", "null", "list", "empty", "blank", "too-long", "nul"],
 )
 def test_invalid_title(client, body):
     assert_error(client.post("/api/rooms", json=body), 422, "invalid_title")
@@ -72,6 +75,8 @@ def test_get_room_returns_room_and_empty_canvas(client):
 
 def test_get_unknown_room_is_404_with_error_body(client):
     assert_error(client.get("/api/rooms/nope"), 404, "room_not_found")
+    # Postgres rejects NUL in query parameters, so this must not reach the database as-is.
+    assert_error(client.get("/api/rooms/abc%00def"), 404, "room_not_found")
 
 
 def test_unknown_route_and_wrong_method_use_the_error_format(client):

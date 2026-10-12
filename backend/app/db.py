@@ -19,6 +19,7 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    URL,
     create_engine,
     event,
     insert,
@@ -58,11 +59,23 @@ class RoomRecord:
     completed_at: str | None
 
 
-def create_db_engine(database_url: str) -> Engine:
+def parse_database_url(database_url: str) -> URL:
     url = make_url(database_url)
+    # Hosting providers (Heroku, Render, Fly) hand out postgres:// URLs, a scheme SQLAlchemy dropped.
+    if url.drivername == "postgres":
+        url = url.set(drivername="postgresql+psycopg")
+    return url
+
+
+def create_db_engine(database_url: str) -> Engine:
+    url = parse_database_url(database_url)
     if url.get_backend_name() != "sqlite":
+        connect_args = {}
+        if url.get_backend_name() == "postgresql" and "connect_timeout" not in url.query:
+            # libpq otherwise waits forever on an unreachable host, hanging startup and save threads.
+            connect_args["connect_timeout"] = 10
         # pre_ping replaces connections a database server closed while idle.
-        return create_engine(url, pool_pre_ping=True)
+        return create_engine(url, pool_pre_ping=True, connect_args=connect_args)
 
     database = url.database or ""
     if database in ("", ":memory:"):
@@ -112,6 +125,9 @@ class Database:
             )
 
     def get_room(self, room_id: str) -> RoomRecord | None:
+        if "\x00" in room_id:
+            # Ids come from URLs; Postgres raises on NUL instead of matching nothing, and no id has one.
+            return None
         with self.engine.connect() as conn:
             row = conn.execute(select(rooms).where(rooms.c.id == room_id)).mappings().first()
         return RoomRecord(**row) if row is not None else None

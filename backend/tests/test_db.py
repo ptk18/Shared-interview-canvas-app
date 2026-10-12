@@ -8,7 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.config import DEFAULT_DATABASE_URL, Settings
-from app.db import Database
+from app.db import Database, parse_database_url
 from app.main import create_app
 
 NOW = "2026-01-01T00:00:00.000Z"
@@ -28,6 +28,21 @@ def test_database_url_comes_from_the_environment(monkeypatch, env, expected):
     for key, value in env.items():
         monkeypatch.setenv(key, value)
     assert Settings.from_env().database_url == expected
+
+
+@pytest.mark.parametrize(
+    ("given", "driver"),
+    [
+        ("postgres://u:p@db:5432/sdi", "postgresql+psycopg"),
+        ("postgresql://u:p@db:5432/sdi", "postgresql"),
+        ("postgresql+psycopg://u:p@db:5432/sdi", "postgresql+psycopg"),
+        ("sqlite:///data/app.db", "sqlite"),
+    ],
+)
+def test_postgres_scheme_from_hosting_providers_is_accepted(given, driver):
+    url = parse_database_url(given)
+    assert url.drivername == driver
+    assert (url.username, url.password, url.host, url.port) == (("u", "p", "db", 5432) if url.host else (None,) * 4)
 
 
 def test_default_database_is_a_sqlite_file_in_backend_data():

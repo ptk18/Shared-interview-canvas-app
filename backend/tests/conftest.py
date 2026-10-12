@@ -11,10 +11,10 @@ import anyio
 import pytest
 from fastapi.testclient import TestClient
 
-from sqlalchemy import create_engine, select
+from sqlalchemy import select
 
 from app.config import Settings
-from app.db import metadata, rooms
+from app.db import create_db_engine, metadata, rooms
 from app.main import create_app
 
 # Run the suite against another database with e.g.
@@ -144,7 +144,7 @@ def wait_for(cond: Callable[[], bool], timeout: float = RECV_TIMEOUT, what: str 
 
 def db_row(settings: Settings, room_id: str) -> dict[str, Any] | None:
     """Reads a room straight from the database, bypassing the app."""
-    engine = create_engine(settings.database_url)
+    engine = create_db_engine(settings.database_url)
     try:
         with engine.connect() as conn:
             row = conn.execute(select(rooms).where(rooms.c.id == room_id)).mappings().first()
@@ -156,7 +156,7 @@ def db_row(settings: Settings, room_id: str) -> dict[str, Any] | None:
 @pytest.fixture
 def make_settings(tmp_path: Path) -> Callable[..., Settings]:
     if TEST_DATABASE_URL:
-        engine = create_engine(TEST_DATABASE_URL)
+        engine = create_db_engine(TEST_DATABASE_URL)
         metadata.drop_all(engine)
         engine.dispose()
     database_url = TEST_DATABASE_URL or f"sqlite:///{tmp_path / 'data' / 'app.db'}"

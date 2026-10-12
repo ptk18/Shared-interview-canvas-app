@@ -15,15 +15,19 @@ class Settings:
     save_debounce_s: float = 0.5
     grace_period_s: float = 30.0
     save_retry_s: float = 2.0
+    # The built frontend (frontend/dist) to serve alongside the API; None serves the API only.
+    static_dir: Path | None = None
 
     @classmethod
     def from_env(cls) -> Settings:
         defaults = cls()
+        static_dir = os.environ.get("SDI_STATIC_DIR", "").strip()
         return cls(
             database_url=os.environ.get("DATABASE_URL", "").strip() or defaults.database_url,
             save_debounce_s=_env_float("SDI_SAVE_DEBOUNCE_MS", defaults.save_debounce_s * 1000) / 1000,
             grace_period_s=_env_float("SDI_GRACE_PERIOD_S", defaults.grace_period_s),
             save_retry_s=defaults.save_retry_s,
+            static_dir=Path(static_dir) if static_dir else None,
         )
 
 

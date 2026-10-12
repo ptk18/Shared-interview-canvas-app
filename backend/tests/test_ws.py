@@ -67,6 +67,7 @@ def test_name_of_40_chars_is_accepted(client):
 
 def test_unknown_room_closes_4004(client):
     expect_rejected_join(client, "/ws/rooms/doesnotexist?name=Ada", 4004, "room_not_found")
+    expect_rejected_join(client, "/ws/rooms/abc%00def?name=Ada", 4004, "room_not_found")
 
 
 def test_third_participant_gets_room_full_4003(client):

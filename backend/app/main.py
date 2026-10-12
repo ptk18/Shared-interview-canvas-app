@@ -14,6 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from .canvas import parse_json
 from .config import Settings
 from .db import Database
+from .frontend import Frontend
 from .rooms import RoomManager
 
 log = logging.getLogger("sdi")
@@ -34,6 +35,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     db = Database(settings.database_url)
     manager = RoomManager(db, settings)
+    frontend = Frontend(settings.static_dir) if settings.static_dir is not None else None
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -48,7 +50,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.manager = manager
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_error(_: Request, exc: StarletteHTTPException) -> Response:
+    async def http_error(request: Request, exc: StarletteHTTPException) -> Response:
+        if exc.status_code == 404 and frontend is not None:
+            page = frontend.response_for(request)
+            if page is not None:
+                return page
         codes = {404: "not_found", 405: "method_not_allowed"}
         return error_response(exc.status_code, codes.get(exc.status_code, "http_error"), str(exc.detail))
 
@@ -72,6 +78,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if not isinstance(title, str) or not title.strip() or len(title.strip()) > MAX_TITLE_LEN:
             return error_response(422, "invalid_title", f"title must be a string of 1-{MAX_TITLE_LEN} characters")
         title = title.strip()
+        if "\x00" in title:  # Postgres text columns cannot store NUL
+            return error_response(422, "invalid_title", "title must not contain NUL characters")
         try:
             title.encode("utf-8")
         except UnicodeEncodeError:
@@ -88,6 +96,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.websocket("/ws/rooms/{room_id}")
     async def room_socket(ws: WebSocket, room_id: str) -> None:
         await manager.serve(ws, room_id, ws.query_params.get("name"), ws.query_params.get("token"))
+
+    if frontend is not None:
+        frontend.mount(app)
 
     return app
 

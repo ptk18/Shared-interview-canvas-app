@@ -16,12 +16,13 @@ make install   # once
 make dev       # backend + frontend → http://localhost:5173 (Ctrl-C stops both)
 make mock      # frontend only, on the in-browser mock backend
 make test      # all tests
+make test-postgres  # backend tests on a throwaway Postgres container
 make help      # everything else
 ```
 
 `make dev` runs the backend on port 8001; use `make dev BACKEND_PORT=8000` to
 change it. The backend stores rooms in SQLite at `backend/data/app.db` by
-default; set `DATABASE_URL` to use another database (see
+default; set `DATABASE_URL` to use Postgres or another SQLite file (see
 [`backend/README.md`](backend/README.md#databases)), e.g.
 `DATABASE_URL=sqlite:////tmp/sdi.db make dev`. The sections below describe the
 same steps without `make`.
@@ -60,6 +61,23 @@ process** (no `--workers`), because room state lives in memory.
 To try collaboration, open the room link in two windows. Each tab is its own
 participant, and its seat token lives in `sessionStorage`.
 
+### With Docker
+
+```bash
+make docker-run         # or the two commands below; open http://localhost:8080
+docker build -t sketchroom .
+docker run --rm -p 8080:8000 -v sketchroom-data:/app/data sketchroom
+```
+
+The image builds the frontend with Node, then serves it from the FastAPI
+backend on port 8000, so the page, `/api` and `/ws` share one origin. Rooms are
+stored in SQLite at `/app/data/app.db`; the volume keeps them across container
+restarts. To use Postgres instead, pass
+`-e DATABASE_URL=postgresql+psycopg://user:password@host:5432/dbname`, or run
+`docker compose up --build`, which starts the app and a Postgres container on
+http://localhost:8080. Room state lives in memory, so run one app container per deployment
+rather than several replicas.
+
 ## Tests
 
 ```bash
@@ -93,6 +111,7 @@ backend/app
   canvas.py            op validation and application
   db.py                snapshot persistence via SQLAlchemy (DATABASE_URL)
   main.py              FastAPI app (REST + WebSocket)
+  frontend.py          serves the built frontend in the Docker image
 ```
 
 Key behaviours:

@@ -34,27 +34,35 @@ uv run pytest
 | `DATABASE_URL` | `sqlite:///<backend>/data/app.db` | SQLAlchemy database URL |
 | `SDI_SAVE_DEBOUNCE_MS` | `500` | quiet time after the last op before a snapshot is written |
 | `SDI_GRACE_PERIOD_S` | `30` | how long a disconnected participant keeps its slot |
+| `SDI_STATIC_DIR` | unset | built frontend (`../frontend/dist`) to serve at `/`; unset serves the API only |
 
 ## Databases
 
 Persistence goes through SQLAlchemy Core (`app/db.py`) using portable SQL, so
-the database is chosen by `DATABASE_URL` alone:
+the database is chosen by `DATABASE_URL` alone. SQLite and Postgres are
+supported (Postgres through the bundled `psycopg` driver):
 
 ```sh
 DATABASE_URL=sqlite:///data/app.db uv run uvicorn app.main:app   # relative to the cwd
 DATABASE_URL=sqlite:////abs/path/app.db uv run uvicorn app.main:app
 DATABASE_URL=sqlite:// uv run uvicorn app.main:app               # in-memory, lost on exit
+DATABASE_URL=postgresql+psycopg://user:password@host:5432/dbname uv run uvicorn app.main:app
 ```
 
-The only database-specific code is the SQLite setup in `create_db_engine`
-(WAL mode, busy timeout, creating the file's folder, a shared connection for
-in-memory databases). To add Postgres later:
+`postgres://` and `postgresql://` URLs, as hosting providers hand them out,
+work too. The database must already exist; the app creates its tables.
 
-1. Add a driver: `uv add "psycopg[binary]"`.
-2. Run with `DATABASE_URL=postgresql+psycopg://user:password@host:5432/dbname`.
-3. Run the test suite against it:
-   `TEST_DATABASE_URL=postgresql+psycopg://…/sdi_test uv run pytest` (it drops and
-   recreates the tables before each test, so use a throwaway database).
+The only database-specific code is in `create_db_engine`: the SQLite setup
+(WAL mode, busy timeout, creating the file's folder, a shared connection for
+in-memory databases) and connection pre-ping for servers such as Postgres.
+Room titles may not contain NUL characters, which Postgres cannot store, so
+both databases accept the same input.
+
+To run the test suite against Postgres, use `make test-postgres` from the repo
+root (it starts and removes a throwaway container), or point it at your own
+database with
+`TEST_DATABASE_URL=postgresql+psycopg://…/sdi_test uv run pytest`. The suite
+drops and recreates the tables before each test, so use a throwaway database.
 
 Tables are created at startup if missing (`metadata.create_all`); existing
 tables and data are left as they are. Once the schema needs to change, add a
@@ -66,3 +74,4 @@ migration tool such as Alembic.
 - `app/rooms.py` — in-memory rooms, slots, per-connection outbound queues, debounced saves
 - `app/db.py` — SQLAlchemy schema and snapshot writes (never overwrite a higher revision or a completed room)
 - `app/main.py` — `create_app()` factory, REST routes, WebSocket endpoint
+- `app/frontend.py` — serves the built frontend for requests no API route matched (enabled by `SDI_STATIC_DIR`)

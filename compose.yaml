@@ -1,0 +1,27 @@
+# The app on Postgres, for local use: `docker compose up --build`, then open http://localhost:8080.
+services:
+  app:
+    build: .
+    ports: ["8080:8000"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://sdi:sdi@db:5432/sdi
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: sdi
+      POSTGRES_PASSWORD: sdi
+      POSTGRES_DB: sdi
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-h", "127.0.0.1", "-U", "sdi", "-d", "sdi"]
+      interval: 2s
+      retries: 30
+
+volumes:
+  db-data:

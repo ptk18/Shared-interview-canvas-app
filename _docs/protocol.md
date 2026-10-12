@@ -120,7 +120,7 @@ Errors always have the body `{"error": {"code": "...", "message": "..."}}`.
 | method & path | success | errors |
 |---|---|---|
 | `GET /api/health` | `200 {"status": "ok"}` | |
-| `POST /api/rooms` body `{"title": string}` | `201 Room` | `422 invalid_title` (title missing/not a string, or blank or > 120 chars after trimming); `422 invalid_request` (body not a JSON object) |
+| `POST /api/rooms` body `{"title": string}` | `201 Room` | `422 invalid_title` (title missing/not a string, blank or > 120 chars after trimming, or containing a NUL character); `422 invalid_request` (body not a JSON object) |
 | `GET /api/rooms/{roomId}` | `200 Room & {"canvas": Canvas}` | `404 room_not_found` |
 
 The title is stored trimmed. `updatedAt` advances with every accepted op. For a room that is live in server memory, `GET`
