@@ -11,6 +11,17 @@ permanently read-only.
 
 ## Quick start
 
+```bash
+make install   # once
+make dev       # backend + frontend → http://localhost:5173 (Ctrl-C stops both)
+make mock      # frontend only, on the in-browser mock backend
+make test      # all tests
+make help      # everything else
+```
+
+`make dev` runs the backend on port 8001; use `make dev BACKEND_PORT=8000` to
+change it. The sections below describe the same steps without `make`.
+
 ### Without a backend (mock mode)
 
 ```bash
